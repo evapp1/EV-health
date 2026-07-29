@@ -1,6 +1,6 @@
 # EV Health Documentation
 
-This directory is the index for the EV Health product and engineering documentation.
+This directory indexes the EV Health product and engineering documentation.
 
 ## Document authority
 
@@ -11,28 +11,50 @@ When documents conflict, use this order unless a later approved document explici
 3. Architecture Specification
 4. UI/UX Design Specification
 5. Battery Engine Specification
-6. Database Specification
+6. Data Model Specification
 7. Task Backlog and implementation notes
 
 ## Available in the repository
 
 ### Software Design Specification
 
-The approved baseline is currently stored at:
-
 - [`../EV_health_docs/EV_Health_SDS_v1.0.md`](../EV_health_docs/EV_Health_SDS_v1.0.md)
 
-It defines the product principles, MVP scope, high-level architecture, engineering rules, AI coding rules, testing requirements, and definition of done.
+Defines the approved product principles, MVP scope, high-level architecture, development rules, testing requirements, and definition of done.
 
-## Completed documents awaiting consolidation
+### Battery Engine Specification
 
-The following documents were created during project planning but were not accessible to the GitHub integration during this update, so they have not been recreated or replaced here:
+- [`BATTERY_ENGINE.md`](BATTERY_ENGINE.md)
+
+Defines validation, SOH, cell delta, temperature spread, score architecture, confidence, partial scans, deterministic insights, versioning, and test vectors.
+
+### Data Model Specification
+
+- [`DATA_MODEL.md`](DATA_MODEL.md)
+
+Defines local-first entities, immutable scan snapshots, raw readings, derived results, reports, demo-data separation, migrations, deletion, privacy, and future cloud boundaries.
+
+### MVP Task Backlog
+
+- [`TASK_BACKLOG.md`](TASK_BACKLOG.md)
+
+Breaks the Android-first Flutter MVP into small AI-friendly tasks, prioritising a complete demo-data application before Bluetooth and BYD integration.
+
+### AI agent rules
+
+- [`../AGENTS.md`](../AGENTS.md)
+
+Defines mandatory reading, architecture boundaries, task execution, testing, privacy, Git discipline, prohibited shortcuts, and stop conditions for Codex and other coding agents.
+
+## Completed documents awaiting repository consolidation
+
+The following approved documents were created during planning but are not yet present in this repository:
 
 - Product Requirements Document
 - UI/UX Design Specification
 - Architecture Specification
 
-Their approved Markdown files should be added here unchanged once available. This avoids creating conflicting versions from conversation summaries.
+Add their final approved Markdown files unchanged when available. Do not reconstruct them from summaries if an approved source exists elsewhere.
 
 ## Recommended final structure
 
@@ -43,9 +65,9 @@ docs/
 ├── 02-SDS.md
 ├── 03-UI-UX-Specification.md
 ├── 04-Architecture-Specification.md
-├── 05-Battery-Engine.md
-├── 06-Database-Specification.md
-├── 07-Task-Backlog.md
+├── BATTERY_ENGINE.md
+├── DATA_MODEL.md
+├── TASK_BACKLOG.md
 └── adr/
 ```
 
@@ -57,13 +79,15 @@ docs/
 - Adapter: ELM327-compatible Bluetooth OBD adapter
 - Storage: local-first
 - Core output: plain-English battery health report
+- Demo-first implementation: required
 - DTC scanning: deferred to Version 1.1
 
 ## Documentation rules
 
 - Do not silently change approved requirements.
-- Version algorithms and vehicle profiles.
+- Version algorithms, scoring configurations, PID maps, and vehicle profiles.
 - Label measured, calculated, estimated, and unavailable values clearly.
-- Keep vehicle-specific logic outside UI code.
-- Update documentation in the same pull request as material implementation changes.
+- Keep vehicle-specific logic and all business logic outside UI code.
+- Historical scan and report snapshots remain immutable.
+- Update documentation in the same pull request as material behaviour changes.
 - AI coding agents must read the governing documents before modifying code.
