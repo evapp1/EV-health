@@ -21,12 +21,25 @@ DTC scanning and plain-English fault-code explanations are planned for Version 1
 
 Project documentation is indexed in [`docs/README.md`](docs/README.md).
 
-The approved Software Design Specification currently remains available at [`EV_health_docs/EV_Health_SDS_v1.0.md`](EV_health_docs/EV_Health_SDS_v1.0.md).
+Key implementation documents now available:
+
+- [`docs/BATTERY_ENGINE.md`](docs/BATTERY_ENGINE.md)
+- [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md)
+- [`docs/TASK_BACKLOG.md`](docs/TASK_BACKLOG.md)
+- [`AGENTS.md`](AGENTS.md)
+
+The approved Software Design Specification remains at [`EV_health_docs/EV_Health_SDS_v1.0.md`](EV_health_docs/EV_Health_SDS_v1.0.md).
+
+The approved PRD, UI/UX Design Specification, and Architecture Specification should be added to the repository from their final source files before implementation tasks that depend on them begin.
 
 ## Project status
 
-The project is currently in the product-blueprint stage. Research, MVP definition, the SDS/Constitution, UI/UX specification, and architecture planning have been completed or are being consolidated before Flutter implementation begins.
+The project is at the implementation-blueprint stage. Research, MVP definition, SDS/Constitution, UI/UX planning, architecture planning, Battery Engine rules, local data model, AI-agent rules, and an initial 51-task development backlog have been defined.
+
+The first coding milestone is a complete, clickable Flutter application using clearly labelled demo data. Real Bluetooth, ELM327, and BYD Dolphin integration follows only after the product shell, report flow, persistence, and automated tests are stable.
 
 ## Development approach
 
-Development will be performed in small, reviewable tasks using AI coding agents. All implementation must follow the approved project documentation, preserve clean architectural boundaries, include tests, and avoid adding features outside the assigned task.
+Development is performed in small, reviewable tasks using AI coding agents. All implementation must follow the approved documentation, preserve clean architectural boundaries, include tests, and avoid adding features outside the assigned task.
+
+Read [`AGENTS.md`](AGENTS.md) before making code changes.
