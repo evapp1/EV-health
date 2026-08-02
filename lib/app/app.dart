@@ -1,3 +1,4 @@
+import 'package:ev_health/app/theme/app_theme.dart';
 import 'package:ev_health/features/home/presentation/screens/app_launch_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -8,10 +9,15 @@ class EvHealthApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'EV Health',
-      home: AppLaunchScreen(),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      // Keep the approved follow-system policy explicit at the app root.
+      // ignore: avoid_redundant_argument_values
+      themeMode: ThemeMode.system,
+      home: const AppLaunchScreen(),
     );
   }
 }
