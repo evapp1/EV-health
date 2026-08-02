@@ -42,6 +42,33 @@ The first coding milestone is a complete, clickable Flutter application using cl
 
 Development begins with `TASK-001 — Initialise Flutter application` in [`docs/TASK_BACKLOG.md`](docs/TASK_BACKLOG.md). Complete one task at a time.
 
+## Local development
+
+Prerequisites:
+
+- Flutter 3.44.8 stable (pinned in `.fvmrc`)
+- Android Studio with the Android SDK and an Android emulator
+- Android API 29 or newer on the target device or emulator
+
+Install dependencies and run the required project checks from the repository root:
+
+```powershell
+flutter pub get
+flutter doctor
+dart format --output=none --set-exit-if-changed .
+flutter analyze
+flutter test
+```
+
+Create or start an Android emulator in Android Studio, confirm that Flutter can see it, and launch the app:
+
+```powershell
+flutter devices
+flutter run
+```
+
+The production Android application ID is `com.evhealth.app`. Development and QA flavor identifiers will be configured by their dedicated implementation task.
+
 ## Development approach
 
 Development is performed in small, reviewable tasks using AI coding agents. All implementation must follow the approved documentation, preserve clean architectural boundaries, include tests, and avoid adding features outside the assigned task.
