@@ -8,9 +8,11 @@ class AppLaunchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(title: const Text('EV Health')),
       body: Center(
         child: Padding(
@@ -20,9 +22,10 @@ class AppLaunchScreen extends StatelessWidget {
             children: [
               Text('Battery health reports', style: textTheme.titleLarge),
               const SizedBox(height: AppSpacing.small),
-              const Text(
+              Text(
                 'Clear battery insights, stored locally on your device.',
                 textAlign: TextAlign.center,
+                style: textTheme.bodyLarge,
               ),
             ],
           ),

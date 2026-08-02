@@ -1,4 +1,6 @@
 import 'package:ev_health/app/app.dart';
+import 'package:ev_health/app/theme/app_theme.dart';
+import 'package:ev_health/app/theme/color_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,19 +18,25 @@ void main() {
     expect(find.byType(FloatingActionButton), findsNothing);
   });
 
-  testWidgets('EV Health follows the system theme by default', (tester) async {
-    tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+  testWidgets('EV Health follows system light and dark theme changes', (
+    tester,
+  ) async {
+    tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
     addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
 
     await tester.pumpWidget(const EvHealthApp());
 
     final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
-    final launchContext = tester.element(find.text('Battery health reports'));
 
     expect(materialApp.themeMode, ThemeMode.system);
-    expect(materialApp.theme, isNotNull);
-    expect(materialApp.darkTheme, isNotNull);
-    expect(Theme.of(launchContext).brightness, Brightness.dark);
+    expect(materialApp.theme, same(AppTheme.light));
+    expect(materialApp.darkTheme, same(AppTheme.dark));
+    _expectLaunchTheme(tester, EvHealthColors.light);
+
+    tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+    await tester.pumpAndSettle();
+
+    _expectLaunchTheme(tester, EvHealthColors.dark);
   });
 
   testWidgets('launch content remains available at 200 percent text scaling', (
@@ -57,4 +65,18 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+}
+
+void _expectLaunchTheme(WidgetTester tester, EvHealthColors colors) {
+  final launchContext = tester.element(find.text('Battery health reports'));
+  final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+  final title = tester.widget<Text>(find.text('Battery health reports'));
+  final body = tester.widget<Text>(
+    find.text('Clear battery insights, stored locally on your device.'),
+  );
+
+  expect(Theme.of(launchContext).brightness, colors.brightness);
+  expect(scaffold.backgroundColor, colors.surface);
+  expect(title.style!.color, colors.textPrimary);
+  expect(body.style!.color, colors.textPrimary);
 }
