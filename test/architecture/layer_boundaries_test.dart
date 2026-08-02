@@ -1,0 +1,92 @@
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  test('required architecture boundaries exist', () {
+    const requiredDirectories = <String>[
+      'lib/app',
+      'lib/core',
+      'lib/domain',
+      'lib/application',
+      'lib/data',
+      'lib/features',
+      'lib/infrastructure',
+      'lib/infrastructure/bluetooth',
+      'lib/infrastructure/elm327',
+      'lib/infrastructure/obd',
+      'lib/infrastructure/vehicles',
+      'lib/infrastructure/persistence',
+      'lib/infrastructure/export',
+      'lib/infrastructure/battery',
+    ];
+
+    for (final path in requiredDirectories) {
+      expect(Directory(path).existsSync(), isTrue, reason: '$path must exist');
+    }
+  });
+
+  test('presentation does not import infrastructure', () {
+    final presentationFiles = Directory('lib/features')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.dart'));
+
+    for (final file in presentationFiles) {
+      final source = file.readAsStringSync();
+      expect(
+        source,
+        isNot(contains('infrastructure/')),
+        reason: '${file.path} imports an infrastructure implementation',
+      );
+    }
+  });
+
+  test('application does not import presentation or infrastructure', () {
+    const forbiddenImports = <String>['features/', 'infrastructure/'];
+    final applicationFiles = Directory('lib/application')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.dart'));
+
+    for (final file in applicationFiles) {
+      final source = file.readAsStringSync();
+      for (final forbiddenImport in forbiddenImports) {
+        expect(
+          source,
+          isNot(contains(forbiddenImport)),
+          reason: '${file.path} imports forbidden dependency $forbiddenImport',
+        );
+      }
+    }
+  });
+
+  test('domain remains independent of framework and implementation layers', () {
+    const forbiddenImports = <String>[
+      'package:flutter/',
+      'package:flutter_riverpod/',
+      'package:riverpod_annotation/',
+      'package:drift/',
+      'package:ev_health/app/',
+      'package:ev_health/application/',
+      'package:ev_health/data/',
+      'package:ev_health/features/',
+      'package:ev_health/infrastructure/',
+    ];
+    final domainFiles = Directory('lib/domain')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.dart'));
+
+    for (final file in domainFiles) {
+      final source = file.readAsStringSync();
+      for (final forbiddenImport in forbiddenImports) {
+        expect(
+          source,
+          isNot(contains(forbiddenImport)),
+          reason: '${file.path} imports forbidden dependency $forbiddenImport',
+        );
+      }
+    }
+  });
+}
