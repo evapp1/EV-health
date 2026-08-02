@@ -18,26 +18,26 @@ void main() {
     expect(find.byType(FloatingActionButton), findsNothing);
   });
 
-  testWidgets('EV Health follows system light and dark theme changes', (
-    tester,
-  ) async {
-    tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
-    addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+  for (final testCase in <(Brightness, EvHealthColors)>[
+    (Brightness.light, EvHealthColors.light),
+    (Brightness.dark, EvHealthColors.dark),
+  ]) {
+    testWidgets('EV Health uses the ${testCase.$1.name} system theme', (
+      tester,
+    ) async {
+      tester.platformDispatcher.platformBrightnessTestValue = testCase.$1;
+      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
 
-    await tester.pumpWidget(const EvHealthApp());
+      await tester.pumpWidget(const EvHealthApp());
 
-    final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
+      final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
 
-    expect(materialApp.themeMode, ThemeMode.system);
-    expect(materialApp.theme, same(AppTheme.light));
-    expect(materialApp.darkTheme, same(AppTheme.dark));
-    _expectLaunchTheme(tester, EvHealthColors.light);
-
-    tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
-    await tester.pumpAndSettle();
-
-    _expectLaunchTheme(tester, EvHealthColors.dark);
-  });
+      expect(materialApp.themeMode, ThemeMode.system);
+      expect(materialApp.theme, same(AppTheme.light));
+      expect(materialApp.darkTheme, same(AppTheme.dark));
+      _expectLaunchTheme(tester, testCase.$2);
+    });
+  }
 
   testWidgets('launch content remains available at 200 percent text scaling', (
     tester,
@@ -70,6 +70,7 @@ void main() {
 void _expectLaunchTheme(WidgetTester tester, EvHealthColors colors) {
   final launchContext = tester.element(find.text('Battery health reports'));
   final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+  final appBar = tester.widget<AppBar>(find.byType(AppBar));
   final title = tester.widget<Text>(find.text('Battery health reports'));
   final body = tester.widget<Text>(
     find.text('Clear battery insights, stored locally on your device.'),
@@ -77,6 +78,8 @@ void _expectLaunchTheme(WidgetTester tester, EvHealthColors colors) {
 
   expect(Theme.of(launchContext).brightness, colors.brightness);
   expect(scaffold.backgroundColor, colors.surface);
+  expect(appBar.backgroundColor, colors.surface);
+  expect(appBar.foregroundColor, colors.textPrimary);
   expect(title.style!.color, colors.textPrimary);
   expect(body.style!.color, colors.textPrimary);
 }
