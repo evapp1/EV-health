@@ -71,6 +71,10 @@ flutter test
 To apply the configured 80-column Dart formatting rules locally, run
 `dart format .` before rerunning the gates.
 
+GitHub Actions runs the same gates for pull requests targeting `main` and
+pushes to `main`. See [`docs/CI.md`](docs/CI.md) for workflow details, caching,
+and limitations.
+
 Create or start an Android emulator in Android Studio, confirm that Flutter can see it, and launch the app:
 
 ```powershell
