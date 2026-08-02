@@ -1,7 +1,7 @@
 import 'package:ev_health/app/app.dart';
 import 'package:ev_health/bootstrap.dart';
 
-/// Starts EV Health with the default local development entry point.
+/// Starts the development EV Health application.
 void main() {
   bootstrap(const EvHealthApp());
 }

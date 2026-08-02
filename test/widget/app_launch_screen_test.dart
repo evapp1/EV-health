@@ -1,4 +1,4 @@
-import 'package:ev_health/main.dart';
+import 'package:ev_health/app/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
