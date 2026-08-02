@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+/// Starts the EV Health application.
 void main() {
   runApp(const EvHealthApp());
 }
 
+/// The root widget for EV Health.
 class EvHealthApp extends StatelessWidget {
+  /// Creates the EV Health application.
   const EvHealthApp({super.key});
 
   @override
@@ -17,7 +20,9 @@ class EvHealthApp extends StatelessWidget {
   }
 }
 
+/// The initial screen shown when EV Health launches.
 class AppLaunchScreen extends StatelessWidget {
+  /// Creates the application launch screen.
   const AppLaunchScreen({super.key});
 
   @override
