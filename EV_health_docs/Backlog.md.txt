@@ -1,0 +1,29 @@
+# EV Health Backlog Compatibility File
+
+This legacy file exists only for tools or local workflows that still reference `EV_health_docs/Backlog.md.txt`.
+
+The canonical backlog is:
+
+- `docs/TASK_BACKLOG.md`
+
+Do not maintain a separate backlog here. Always follow the canonical file when there is any difference.
+
+## TASK-001 — Initialise Flutter application
+
+**Objective:** Create the Android-first Flutter project in the approved application directory.
+
+**Dependencies:** None.
+
+**Acceptance criteria:**
+
+- The app launches on an Android emulator.
+- Package and application identifiers follow project naming rules.
+- Generated sample counter code is removed.
+- The repository README contains setup and launch commands.
+
+**Tests:**
+
+- Replace the generated sample test with an EV Health smoke/widget test.
+- Run the relevant formatting, analysis, and test commands available after project creation.
+
+**Execution rule:** Complete TASK-001 only, report the result, and stop before TASK-002.

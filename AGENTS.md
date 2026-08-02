@@ -6,15 +6,16 @@ This file defines mandatory operating rules for AI coding agents working on EV H
 
 When documents conflict, follow this order unless a later approved decision explicitly changes it:
 
-1. `EV_health_docs/EV_Health_SDS_v1.0.md` — SDS / Constitution
-2. Approved Product Requirements Document
-3. Approved Architecture Specification
-4. Approved UI/UX Design Specification
-5. `docs/BATTERY_ENGINE.md`
-6. `docs/DATA_MODEL.md`
-7. `docs/TASK_BACKLOG.md`
-8. Task-specific issue or prompt
-9. Existing implementation
+1. `EV_health_docs/EV_Health_SDS_v1.0.md` — combined SDS / Constitution and product-requirements baseline
+2. `docs/EV_Health_Architecture_Specification_v1.0.md` — Architecture Specification
+3. `docs/EV_Health_UI_UX_Design_Specification_v1.0.md` — approved UI/UX MVP baseline
+4. `docs/BATTERY_ENGINE.md`
+5. `docs/DATA_MODEL.md`
+6. `docs/TASK_BACKLOG.md`
+7. Task-specific issue or prompt
+8. Existing implementation
+
+The SDS intentionally serves as both the Constitution and the PRD-equivalent product baseline. Do not stop merely because there is no separate PRD file.
 
 Never silently resolve a conflict. Stop and report it.
 
@@ -23,14 +24,14 @@ Never silently resolve a conflict. Stop and report it.
 Read:
 
 - this file
-- the SDS / Constitution
-- the Architecture Specification
-- the relevant feature sections in the PRD and UI/UX Specification
+- `EV_health_docs/EV_Health_SDS_v1.0.md`
+- `docs/EV_Health_Architecture_Specification_v1.0.md`
+- `docs/EV_Health_UI_UX_Design_Specification_v1.0.md`
 - the assigned task in `docs/TASK_BACKLOG.md`
-- `docs/BATTERY_ENGINE.md` for any battery result logic
-- `docs/DATA_MODEL.md` for persistence or report work
+- `docs/BATTERY_ENGINE.md` for battery result, scoring, grading, confidence, validation, or insight logic
+- `docs/DATA_MODEL.md` for persistence, scan snapshots, reports, settings, deletion, or migration work
 
-Do not begin implementation when a required approved document is missing and the task depends on it.
+Do not begin implementation when a required governing document is genuinely unavailable or the assigned task depends on an unresolved decision.
 
 ## 3. Task execution protocol
 
@@ -59,7 +60,7 @@ Do not begin implementation when a required approved document is missing and the
 
 - Never invent missing vehicle data.
 - Never substitute demo, previous-scan, or default values into a real scan.
-- Label measured, calculated, estimated, and unavailable values.
+- Label measured, calculated, estimated, demo, and unavailable values.
 - Keep thresholds and score weights in versioned configuration.
 - Historical scan and report snapshots are immutable.
 - Do not claim safety, manufacturer certification, warranty eligibility, fault absence, or remaining battery life.
@@ -156,9 +157,16 @@ Stop and report rather than guessing when:
 - a dependency choice changes the approved architecture
 - tests reveal unexplained vehicle-data variation
 - the requested change expands scope beyond the assigned task
-- required final PRD, UI/UX, or Architecture documents are unavailable
+- a required baseline file is unavailable or unreadable
+- the task depends on an unresolved decision identified in the governing documents
 
-## 13. Completion report template
+## 13. Flutter start point
+
+Development is authorised to begin with `TASK-001 — Initialise Flutter application` in `docs/TASK_BACKLOG.md`.
+
+Complete TASK-001 only, run its required checks, report results, and stop before TASK-002.
+
+## 14. Completion report template
 
 ```text
 Task:

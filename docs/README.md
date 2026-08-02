@@ -4,23 +4,39 @@ This directory indexes the EV Health product and engineering documentation.
 
 ## Document authority
 
-When documents conflict, use this order unless a later approved document explicitly changes it:
+When documents conflict, use this order unless a later approved decision explicitly changes it:
 
-1. Software Design Specification / Constitution
-2. Product Requirements Document
-3. Architecture Specification
-4. UI/UX Design Specification
-5. Battery Engine Specification
-6. Data Model Specification
-7. Task Backlog and implementation notes
+1. SDS / Constitution and product-requirements baseline
+2. Architecture Specification
+3. UI/UX Design Specification
+4. Battery Engine Specification
+5. Data Model Specification
+6. Task Backlog
+7. Task-specific implementation notes
+8. Existing implementation
 
-## Available in the repository
+The approved SDS intentionally combines the Constitution, product requirements, high-level design rules, and development rules. A separate PRD is not required for the current MVP baseline.
 
-### Software Design Specification
+## Approved baselines
+
+### SDS / Constitution and product requirements
 
 - [`../EV_health_docs/EV_Health_SDS_v1.0.md`](../EV_health_docs/EV_Health_SDS_v1.0.md)
 
-Defines the approved product principles, MVP scope, high-level architecture, development rules, testing requirements, and definition of done.
+This is the highest-authority project document and serves as both the SDS/Constitution and the product-requirements baseline.
+
+### Architecture Specification
+
+- [`EV_Health_Architecture_Specification_v1.0.md`](EV_Health_Architecture_Specification_v1.0.md)
+
+Defines the Android-first Flutter architecture, dependency boundaries, state management, navigation, Bluetooth and ELM327 abstractions, OBD pipeline, vehicle-profile structure, persistence, testing strategy, and extension points.
+
+### UI/UX Design Specification
+
+- [`EV_Health_UI_UX_Design_Specification_v1.0.md`](EV_Health_UI_UX_Design_Specification_v1.0.md)
+- [`UI_UX_BASELINE_APPROVAL.md`](UI_UX_BASELINE_APPROVAL.md)
+
+The UI/UX Design Specification is approved as the MVP implementation baseline. The approval record governs its status even where the original document header still contains earlier draft wording.
 
 ### Battery Engine Specification
 
@@ -46,29 +62,24 @@ Breaks the Android-first Flutter MVP into small AI-friendly tasks, prioritising 
 
 Defines mandatory reading, architecture boundaries, task execution, testing, privacy, Git discipline, prohibited shortcuts, and stop conditions for Codex and other coding agents.
 
-## Completed documents awaiting repository consolidation
-
-The following approved documents were created during planning but are not yet present in this repository:
-
-- Product Requirements Document
-- UI/UX Design Specification
-- Architecture Specification
-
-Add their final approved Markdown files unchanged when available. Do not reconstruct them from summaries if an approved source exists elsewhere.
-
-## Recommended final structure
+## Repository documentation structure
 
 ```text
+EV_health_docs/
+└── EV_Health_SDS_v1.0.md
+
 docs/
 ├── README.md
-├── 01-PRD.md
-├── 02-SDS.md
-├── 03-UI-UX-Specification.md
-├── 04-Architecture-Specification.md
+├── EV_Health_Architecture_Specification_v1.0.md
+├── EV_Health_UI_UX_Design_Specification_v1.0.md
+├── UI_UX_BASELINE_APPROVAL.md
 ├── BATTERY_ENGINE.md
 ├── DATA_MODEL.md
 ├── TASK_BACKLOG.md
 └── adr/
+
+AGENTS.md
+README.md
 ```
 
 ## MVP baseline
@@ -82,11 +93,17 @@ docs/
 - Demo-first implementation: required
 - DTC scanning: deferred to Version 1.1
 
+## Flutter readiness
+
+The governing baseline documents are available. Flutter development may begin with `TASK-001 — Initialise Flutter application`.
+
+Agents must complete one numbered task at a time, run the required checks, report results, and stop before starting the next task.
+
 ## Documentation rules
 
 - Do not silently change approved requirements.
 - Version algorithms, scoring configurations, PID maps, and vehicle profiles.
-- Label measured, calculated, estimated, and unavailable values clearly.
+- Label measured, calculated, estimated, demo, and unavailable values clearly.
 - Keep vehicle-specific logic and all business logic outside UI code.
 - Historical scan and report snapshots remain immutable.
 - Update documentation in the same pull request as material behaviour changes.
