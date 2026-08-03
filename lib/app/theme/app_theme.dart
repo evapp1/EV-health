@@ -51,6 +51,24 @@ abstract final class AppTheme {
           borderRadius: AppSpacing.cardRadius,
         ),
       ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: colors.surface,
+        indicatorColor: colors.primary.withValues(alpha: 0.12),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          return IconThemeData(
+            color: states.contains(WidgetState.selected)
+                ? colors.primary
+                : colors.textSecondary,
+          );
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          return textTheme.labelLarge?.copyWith(
+            color: states.contains(WidgetState.selected)
+                ? colors.primary
+                : colors.textSecondary,
+          );
+        }),
+      ),
       filledButtonTheme: FilledButtonThemeData(style: commonButtonStyle),
       elevatedButtonTheme: ElevatedButtonThemeData(style: commonButtonStyle),
       outlinedButtonTheme: OutlinedButtonThemeData(
