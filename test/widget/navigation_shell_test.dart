@@ -1,13 +1,14 @@
 import 'package:ev_health/app/app.dart';
 import 'package:ev_health/app/theme/app_theme.dart';
 import 'package:ev_health/app/theme/color_tokens.dart';
+import 'package:ev_health/infrastructure/persistence/in_memory_onboarding_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
   testWidgets('initial route opens Home', (tester) async {
-    await tester.pumpWidget(const EvHealthApp());
+    await tester.pumpWidget(_returningUserApp());
     await tester.pumpAndSettle();
 
     expect(find.text('EV Health'), findsOneWidget);
@@ -19,7 +20,7 @@ void main() {
   testWidgets('bottom navigation opens every approved root destination', (
     tester,
   ) async {
-    await tester.pumpWidget(const EvHealthApp());
+    await tester.pumpWidget(_returningUserApp());
     await tester.pumpAndSettle();
 
     const destinations = <(String, String, int)>[
@@ -39,7 +40,7 @@ void main() {
   });
 
   testWidgets('a branch restores its nested navigation state', (tester) async {
-    await tester.pumpWidget(const EvHealthApp());
+    await tester.pumpWidget(_returningUserApp());
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Settings'));
@@ -70,7 +71,7 @@ void main() {
   testWidgets('Android back returns nested routes to their parent', (
     tester,
   ) async {
-    await tester.pumpWidget(const EvHealthApp());
+    await tester.pumpWidget(_returningUserApp());
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Settings'));
@@ -89,7 +90,7 @@ void main() {
   testWidgets('Android back returns a non-Home root to Home before exit', (
     tester,
   ) async {
-    await tester.pumpWidget(const EvHealthApp());
+    await tester.pumpWidget(_returningUserApp());
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('History'));
@@ -119,7 +120,7 @@ void main() {
       tester.platformDispatcher.platformBrightnessTestValue = testCase.$1;
       addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
 
-      await tester.pumpWidget(const EvHealthApp());
+      await tester.pumpWidget(_returningUserApp());
       await tester.pumpAndSettle();
 
       final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
@@ -139,12 +140,12 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      const MediaQuery(
-        data: MediaQueryData(
+      MediaQuery(
+        data: const MediaQueryData(
           size: Size(360, 800),
           textScaler: TextScaler.linear(2),
         ),
-        child: EvHealthApp(),
+        child: _returningUserApp(),
       ),
     );
     await tester.pumpAndSettle();
@@ -159,6 +160,12 @@ void main() {
       );
     }
   });
+}
+
+EvHealthApp _returningUserApp() {
+  return EvHealthApp(
+    onboardingRepository: InMemoryOnboardingRepository(initiallyComplete: true),
+  );
 }
 
 NavigationBar _navigationBar(WidgetTester tester) {
