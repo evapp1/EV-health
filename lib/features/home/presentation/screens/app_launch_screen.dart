@@ -9,11 +9,16 @@ class AppLaunchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      appBar: AppBar(title: const Text('EV Health')),
+      backgroundColor: colorScheme.surface,
+      appBar: AppBar(
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
+        title: const Text('EV Health'),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.large),
