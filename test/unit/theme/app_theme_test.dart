@@ -64,5 +64,32 @@ void main() {
         const Size(0, AppSpacing.minimumTouchTarget),
       );
     });
+
+    test('centralizes bottom navigation colors and typography', () {
+      final theme = AppTheme.light;
+      final navigationTheme = theme.navigationBarTheme;
+
+      expect(navigationTheme.backgroundColor, EvHealthColors.light.surface);
+      expect(
+        navigationTheme.indicatorColor,
+        EvHealthColors.light.primary.withValues(alpha: 0.12),
+      );
+      expect(
+        navigationTheme.iconTheme!.resolve(<WidgetState>{
+          WidgetState.selected,
+        })!.color,
+        EvHealthColors.light.primary,
+      );
+      expect(
+        navigationTheme.iconTheme!.resolve(<WidgetState>{})!.color,
+        EvHealthColors.light.textSecondary,
+      );
+      expect(
+        navigationTheme.labelTextStyle!.resolve(<WidgetState>{
+          WidgetState.selected,
+        })!.color,
+        EvHealthColors.light.primary,
+      );
+    });
   });
 }
