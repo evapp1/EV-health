@@ -1,5 +1,17 @@
 /// Stable route names used by the EV Health router.
 abstract final class AppRouteNames {
+  /// Welcome onboarding screen.
+  static const onboardingWelcome = 'onboarding-welcome';
+
+  /// How It Works onboarding screen.
+  static const onboardingHowItWorks = 'onboarding-how-it-works';
+
+  /// Privacy onboarding screen.
+  static const onboardingPrivacy = 'onboarding-privacy';
+
+  /// Bluetooth explanation onboarding screen.
+  static const onboardingBluetooth = 'onboarding-bluetooth';
+
   /// Home root destination.
   static const home = 'home';
 
@@ -18,6 +30,18 @@ abstract final class AppRouteNames {
 
 /// Stable route paths used by the EV Health router.
 abstract final class AppRoutePaths {
+  /// Welcome onboarding path.
+  static const onboardingWelcome = '/onboarding';
+
+  /// How It Works onboarding path.
+  static const onboardingHowItWorks = '/onboarding/how-it-works';
+
+  /// Privacy onboarding path.
+  static const onboardingPrivacy = '/onboarding/privacy';
+
+  /// Bluetooth explanation onboarding path.
+  static const onboardingBluetooth = '/onboarding/bluetooth';
+
   /// Home root path.
   static const home = '/home';
 
