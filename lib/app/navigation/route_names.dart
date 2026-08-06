@@ -12,6 +12,9 @@ abstract final class AppRouteNames {
   /// Bluetooth explanation onboarding screen.
   static const onboardingBluetooth = 'onboarding-bluetooth';
 
+  /// Simulated adapter discovery setup screen.
+  static const adapterDiscovery = 'adapter-discovery';
+
   /// Home root destination.
   static const home = 'home';
 
@@ -41,6 +44,9 @@ abstract final class AppRoutePaths {
 
   /// Bluetooth explanation onboarding path.
   static const onboardingBluetooth = '/onboarding/bluetooth';
+
+  /// Simulated adapter discovery setup path.
+  static const adapterDiscovery = '/setup/adapters';
 
   /// Home root path.
   static const home = '/home';

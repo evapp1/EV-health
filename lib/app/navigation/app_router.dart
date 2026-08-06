@@ -1,6 +1,8 @@
 import 'package:ev_health/app/navigation/app_shell.dart';
 import 'package:ev_health/app/navigation/route_names.dart';
+import 'package:ev_health/application/home/home_controller.dart';
 import 'package:ev_health/application/onboarding/onboarding_flow_controller.dart';
+import 'package:ev_health/features/adapter_discovery/presentation/screens/adapter_discovery_screen.dart';
 import 'package:ev_health/features/history/presentation/screens/history_screen.dart';
 import 'package:ev_health/features/home/presentation/screens/home_screen.dart';
 import 'package:ev_health/features/onboarding/presentation/screens/bluetooth_onboarding_screen.dart';
@@ -13,7 +15,10 @@ import 'package:ev_health/features/settings/presentation/screens/settings_screen
 import 'package:go_router/go_router.dart';
 
 /// Creates the application router and its state-preserving root branches.
-Future<GoRouter> createAppRouter(OnboardingFlowController onboarding) async {
+Future<GoRouter> createAppRouter(
+  OnboardingFlowController onboarding, {
+  DemoScanAction? homeDemoScanAction,
+}) async {
   final startupDestination = await onboarding.resolveStartupDestination();
 
   return GoRouter(
@@ -85,6 +90,13 @@ Future<GoRouter> createAppRouter(OnboardingFlowController onboarding) async {
           },
         ),
       ),
+      GoRoute(
+        name: AppRouteNames.adapterDiscovery,
+        path: AppRoutePaths.adapterDiscovery,
+        builder: (context, state) => AdapterDiscoveryScreen(
+          onBack: () => context.go(AppRoutePaths.home),
+        ),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return AppShell(
@@ -100,7 +112,11 @@ Future<GoRouter> createAppRouter(OnboardingFlowController onboarding) async {
               GoRoute(
                 name: AppRouteNames.home,
                 path: AppRoutePaths.home,
-                builder: (context, state) => const HomeScreen(),
+                builder: (context, state) => HomeScreen(
+                  onDemoScan:
+                      homeDemoScanAction ??
+                      () => context.go(AppRoutePaths.adapterDiscovery),
+                ),
               ),
             ],
           ),

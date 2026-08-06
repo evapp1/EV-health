@@ -16,7 +16,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Repository-backed Home destination for the labelled demo experience.
 class HomeScreen extends ConsumerWidget {
   /// Creates Home.
-  const HomeScreen({super.key});
+  const HomeScreen({this.onDemoScan, super.key});
+
+  /// Optional navigation-level override for the Home demo scan action.
+  final DemoScanAction? onDemoScan;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,8 +34,9 @@ class HomeScreen extends ConsumerWidget {
         ),
         data: (data) => _HomeContent(
           viewData: HomeViewData.from(data),
-          onDemoScan: () =>
-              ref.read(homeControllerProvider.notifier).startDemoScan(),
+          onDemoScan: () => ref
+              .read(homeControllerProvider.notifier)
+              .startDemoScan(onDemoScan),
         ),
       ),
     );

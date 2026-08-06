@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ev_health/app/navigation/app_router.dart';
 import 'package:ev_health/app/theme/app_theme.dart';
+import 'package:ev_health/application/adapter_discovery/adapter_discovery_controller.dart';
 import 'package:ev_health/application/home/home_controller.dart';
 import 'package:ev_health/application/onboarding/onboarding_flow_controller.dart';
 import 'package:ev_health/domain/onboarding/onboarding_repository.dart';
@@ -26,6 +27,9 @@ class EvHealthApp extends StatefulWidget {
     this.homeHistoryRepository,
     this.homeSettingsRepository,
     this.demoScanAction,
+    this.adapterDiscoveryInitialState,
+    this.adapterDiscoveryRetryAction,
+    this.mockAdapterSelectionAction,
     super.key,
   });
 
@@ -47,6 +51,15 @@ class EvHealthApp extends StatefulWidget {
   /// Injects the application-level placeholder that starts demo scanning.
   final DemoScanAction? demoScanAction;
 
+  /// Overrides the initial simulated adapter discovery state.
+  final AdapterDiscoveryState? adapterDiscoveryInitialState;
+
+  /// Overrides simulated discovery retry behaviour.
+  final AdapterDiscoveryRetryAction? adapterDiscoveryRetryAction;
+
+  /// Overrides fictional adapter selection behaviour.
+  final MockAdapterSelectionAction? mockAdapterSelectionAction;
+
   @override
   State<EvHealthApp> createState() => _EvHealthAppState();
 }
@@ -56,7 +69,6 @@ class _EvHealthAppState extends State<EvHealthApp> {
   late final VehicleRepository _homeVehicleRepository;
   late final HistoryRepository _homeHistoryRepository;
   late final SettingsRepository _homeSettingsRepository;
-  late final DemoScanAction _demoScanAction;
 
   @override
   void initState() {
@@ -67,7 +79,6 @@ class _EvHealthAppState extends State<EvHealthApp> {
         widget.homeHistoryRepository ?? DemoHistoryRepository();
     _homeSettingsRepository =
         widget.homeSettingsRepository ?? const DemoSettingsRepository();
-    _demoScanAction = widget.demoScanAction ?? _defaultDemoScanAction;
     unawaited(_initializeRouter());
   }
 
@@ -76,7 +87,10 @@ class _EvHealthAppState extends State<EvHealthApp> {
       widget.onboardingRepository ?? InMemoryOnboardingRepository(),
       widget.bluetoothOnboardingAction ?? _defaultBluetoothAction,
     );
-    final router = await createAppRouter(onboarding);
+    final router = await createAppRouter(
+      onboarding,
+      homeDemoScanAction: widget.demoScanAction,
+    );
 
     if (!mounted) {
       router.dispose();
@@ -107,7 +121,18 @@ class _EvHealthAppState extends State<EvHealthApp> {
           homeSettingsRepositoryProvider.overrideWithValue(
             _homeSettingsRepository,
           ),
-          demoScanActionProvider.overrideWithValue(_demoScanAction),
+          adapterDiscoveryInitialStateProvider.overrideWithValue(
+            widget.adapterDiscoveryInitialState ??
+                const AdapterDiscoverySearching(),
+          ),
+          if (widget.adapterDiscoveryRetryAction != null)
+            adapterDiscoveryRetryActionProvider.overrideWithValue(
+              widget.adapterDiscoveryRetryAction!,
+            ),
+          if (widget.mockAdapterSelectionAction != null)
+            mockAdapterSelectionActionProvider.overrideWithValue(
+              widget.mockAdapterSelectionAction!,
+            ),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -126,7 +151,18 @@ class _EvHealthAppState extends State<EvHealthApp> {
         homeSettingsRepositoryProvider.overrideWithValue(
           _homeSettingsRepository,
         ),
-        demoScanActionProvider.overrideWithValue(_demoScanAction),
+        adapterDiscoveryInitialStateProvider.overrideWithValue(
+          widget.adapterDiscoveryInitialState ??
+              const AdapterDiscoverySearching(),
+        ),
+        if (widget.adapterDiscoveryRetryAction != null)
+          adapterDiscoveryRetryActionProvider.overrideWithValue(
+            widget.adapterDiscoveryRetryAction!,
+          ),
+        if (widget.mockAdapterSelectionAction != null)
+          mockAdapterSelectionActionProvider.overrideWithValue(
+            widget.mockAdapterSelectionAction!,
+          ),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
@@ -142,6 +178,4 @@ class _EvHealthAppState extends State<EvHealthApp> {
   }
 
   static Future<void> _defaultBluetoothAction() async {}
-
-  static Future<void> _defaultDemoScanAction() async {}
 }
