@@ -76,7 +76,7 @@ final class HomeController extends AsyncNotifier<HomeData> {
   }
 
   /// Dispatches the primary demo scan intent without implementing scan flow.
-  Future<void> startDemoScan() async {
+  Future<void> startDemoScan([DemoScanAction? action]) async {
     final home = state.value;
     if (home == null || !home.isDemoMode) {
       throw StateError('The demo scan action requires loaded demo Home data.');
@@ -87,7 +87,9 @@ final class HomeController extends AsyncNotifier<HomeData> {
 
     _isStartingDemoScan = true;
     try {
-      await ref.read(demoScanActionProvider)();
+      final DemoScanAction selectedAction =
+          action ?? ref.read(demoScanActionProvider);
+      await selectedAction();
     } finally {
       _isStartingDemoScan = false;
     }

@@ -63,6 +63,53 @@ void main() {
     }
   });
 
+  test(
+    'adapter discovery mock uses no platform Bluetooth or permission API',
+    () {
+      const forbiddenDetails = <String>[
+        'package:ev_health/infrastructure/',
+        'package:flutter/services.dart',
+        'permission_handler',
+        'MethodChannel',
+        'BluetoothAdapter',
+        'BluetoothDevice',
+        'BLUETOOTH_SCAN',
+        'BLUETOOTH_CONNECT',
+      ];
+      const roots = <String>[
+        'lib/application/adapter_discovery',
+        'lib/features/adapter_discovery',
+      ];
+
+      for (final root in roots) {
+        final files = Directory(root)
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'));
+        for (final file in files) {
+          final source = file.readAsStringSync();
+          for (final forbiddenDetail in forbiddenDetails) {
+            expect(
+              source,
+              isNot(contains(forbiddenDetail)),
+              reason: '${file.path} references real API $forbiddenDetail',
+            );
+          }
+        }
+      }
+
+      final manifests = Directory('android')
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((file) => file.path.endsWith('AndroidManifest.xml'));
+      for (final manifest in manifests) {
+        final source = manifest.readAsStringSync();
+        expect(source, isNot(contains('BLUETOOTH_SCAN')));
+        expect(source, isNot(contains('BLUETOOTH_CONNECT')));
+      }
+    },
+  );
+
   test('application does not import presentation or infrastructure', () {
     const forbiddenImports = <String>['features/', 'infrastructure/'];
     final applicationFiles = Directory('lib/application')

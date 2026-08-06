@@ -39,6 +39,37 @@ void main() {
     }
   });
 
+  testWidgets(
+    'Home demo action opens discovery and Android back returns Home',
+    (tester) async {
+      await tester.pumpWidget(_returningUserApp());
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('home-demo-scan-action')),
+        300,
+      );
+      await tester.tap(find.byKey(const Key('home-demo-scan-action')));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(
+        _router(tester).routeInformationProvider.value.uri.path,
+        '/setup/adapters',
+      );
+      expect(find.text('Choose your adapter'), findsOneWidget);
+      expect(find.text('SIMULATED DISCOVERY'), findsOneWidget);
+      expect(find.byType(NavigationBar), findsNothing);
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      expect(_router(tester).routeInformationProvider.value.uri.path, '/home');
+      expect(find.text('Latest demo battery report'), findsOneWidget);
+      expect(_navigationBar(tester).selectedIndex, 0);
+    },
+  );
+
   testWidgets('a branch restores its nested navigation state', (tester) async {
     await tester.pumpWidget(_returningUserApp());
     await tester.pumpAndSettle();
