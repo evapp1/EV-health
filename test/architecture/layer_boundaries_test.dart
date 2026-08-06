@@ -89,4 +89,30 @@ void main() {
       }
     }
   });
+
+  test('repository interfaces expose no infrastructure details', () {
+    const forbiddenDetails = <String>[
+      'package:ev_health/infrastructure/',
+      'package:ev_health/data/',
+      'package:drift/',
+      'sqlite',
+      'json',
+      'Map<String, dynamic>',
+    ];
+    final repositoryFiles = Directory('lib/domain/repositories')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.dart'));
+
+    for (final file in repositoryFiles) {
+      final source = file.readAsStringSync();
+      for (final forbiddenDetail in forbiddenDetails) {
+        expect(
+          source,
+          isNot(contains(forbiddenDetail)),
+          reason: '${file.path} exposes infrastructure detail $forbiddenDetail',
+        );
+      }
+    }
+  });
 }
