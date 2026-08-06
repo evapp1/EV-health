@@ -110,6 +110,48 @@ void main() {
     },
   );
 
+  test(
+    'vehicle confirmation invokes no live vehicle, Bluetooth, OBD, or telemetry API',
+    () {
+      const forbiddenDetails = <String>[
+        'package:ev_health/infrastructure/',
+        'package:ev_health/data/',
+        'package:flutter/services.dart',
+        'MethodChannel',
+        'BluetoothAdapter',
+        'BluetoothDevice',
+        'Elm327',
+        'ObdCommand',
+        'Telemetry',
+        'readVin',
+        'readVIN',
+        'BLUETOOTH_SCAN',
+        'BLUETOOTH_CONNECT',
+      ];
+      const roots = <String>[
+        'lib/application/vehicle_confirmation',
+        'lib/features/vehicle_confirmation',
+      ];
+
+      for (final root in roots) {
+        final files = Directory(root)
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'));
+        for (final file in files) {
+          final source = file.readAsStringSync();
+          for (final forbiddenDetail in forbiddenDetails) {
+            expect(
+              source,
+              isNot(contains(forbiddenDetail)),
+              reason: '${file.path} references live API $forbiddenDetail',
+            );
+          }
+        }
+      }
+    },
+  );
+
   test('application does not import presentation or infrastructure', () {
     const forbiddenImports = <String>['features/', 'infrastructure/'];
     final applicationFiles = Directory('lib/application')

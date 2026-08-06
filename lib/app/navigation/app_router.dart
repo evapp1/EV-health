@@ -12,6 +12,7 @@ import 'package:ev_health/features/onboarding/presentation/screens/welcome_onboa
 import 'package:ev_health/features/reports/presentation/screens/reports_screen.dart';
 import 'package:ev_health/features/settings/presentation/screens/settings_about_screen.dart';
 import 'package:ev_health/features/settings/presentation/screens/settings_screen.dart';
+import 'package:ev_health/features/vehicle_confirmation/presentation/screens/vehicle_confirmation_screen.dart';
 import 'package:go_router/go_router.dart';
 
 /// Creates the application router and its state-preserving root branches.
@@ -95,6 +96,22 @@ Future<GoRouter> createAppRouter(
         path: AppRoutePaths.adapterDiscovery,
         builder: (context, state) => AdapterDiscoveryScreen(
           onBack: () => context.go(AppRoutePaths.home),
+          onSelectionComplete: () =>
+              context.go(AppRoutePaths.vehicleConfirmation),
+        ),
+      ),
+      GoRoute(
+        name: AppRouteNames.vehicleConfirmation,
+        path: AppRoutePaths.vehicleConfirmation,
+        builder: (context, state) => VehicleConfirmationScreen(
+          onBack: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppRoutePaths.adapterDiscovery);
+            }
+          },
+          onSafeExitComplete: () => context.go(AppRoutePaths.adapterDiscovery),
         ),
       ),
       StatefulShellRoute.indexedStack(

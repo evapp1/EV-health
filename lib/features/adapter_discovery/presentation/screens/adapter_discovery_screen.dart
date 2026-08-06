@@ -10,10 +10,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Focused adapter discovery route backed only by simulated application state.
 class AdapterDiscoveryScreen extends ConsumerWidget {
   /// Creates the mock adapter discovery screen.
-  const AdapterDiscoveryScreen({this.onBack, super.key});
+  const AdapterDiscoveryScreen({
+    this.onBack,
+    this.onSelectionComplete,
+    super.key,
+  });
 
   /// Optional route-level action used for predictable setup-flow back.
   final VoidCallback? onBack;
+
+  /// Optional route-level action after fictional selection succeeds.
+  final VoidCallback? onSelectionComplete;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -56,7 +63,10 @@ class AdapterDiscoveryScreen extends ConsumerWidget {
                   _DiscoveryStateContent(
                     state: state,
                     onRetry: controller.retry,
-                    onSelect: controller.selectAdapter,
+                    onSelect: (adapter) async {
+                      await controller.selectAdapter(adapter);
+                      onSelectionComplete?.call();
+                    },
                   ),
                 ],
               ),

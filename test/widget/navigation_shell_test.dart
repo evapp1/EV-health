@@ -1,6 +1,7 @@
 import 'package:ev_health/app/app.dart';
 import 'package:ev_health/app/theme/app_theme.dart';
 import 'package:ev_health/app/theme/color_tokens.dart';
+import 'package:ev_health/application/adapter_discovery/adapter_discovery_controller.dart';
 import 'package:ev_health/infrastructure/persistence/in_memory_onboarding_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -67,6 +68,51 @@ void main() {
       expect(_router(tester).routeInformationProvider.value.uri.path, '/home');
       expect(find.text('Latest demo battery report'), findsOneWidget);
       expect(_navigationBar(tester).selectedIndex, 0);
+    },
+  );
+
+  testWidgets(
+    'mock adapter selection opens vehicle confirmation and back returns discovery',
+    (tester) async {
+      var selectionCalls = 0;
+      await tester.pumpWidget(
+        _returningUserApp(
+          discoveryState: AdapterDiscoveryDevicesFound(
+            AdapterDiscoveryMockFixtures.devices,
+          ),
+          onSelect: (adapter) => selectionCalls += 1,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('home-demo-scan-action')),
+        300,
+      );
+      await tester.tap(find.byKey(const Key('home-demo-scan-action')));
+      await tester.pumpAndSettle();
+      final adapter = find.byKey(const Key('mock-adapter-MOCK-AURORA-01'));
+      await tester.ensureVisible(adapter);
+      await tester.tap(adapter);
+      await tester.pumpAndSettle();
+
+      expect(selectionCalls, 1);
+      expect(
+        _router(tester).routeInformationProvider.value.uri.path,
+        '/setup/vehicle',
+      );
+      expect(find.text('BYD Dolphin Premium'), findsOneWidget);
+      expect(find.text('DEMO / MOCK PROFILE'), findsOneWidget);
+      expect(find.byType(NavigationBar), findsNothing);
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      expect(
+        _router(tester).routeInformationProvider.value.uri.path,
+        '/setup/adapters',
+      );
+      expect(find.text('Representative mock devices'), findsOneWidget);
     },
   );
 
@@ -193,9 +239,14 @@ void main() {
   });
 }
 
-EvHealthApp _returningUserApp() {
+EvHealthApp _returningUserApp({
+  AdapterDiscoveryState? discoveryState,
+  MockAdapterSelectionAction? onSelect,
+}) {
   return EvHealthApp(
     onboardingRepository: InMemoryOnboardingRepository(initiallyComplete: true),
+    adapterDiscoveryInitialState: discoveryState,
+    mockAdapterSelectionAction: onSelect,
   );
 }
 
