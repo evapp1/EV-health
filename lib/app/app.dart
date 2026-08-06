@@ -5,6 +5,7 @@ import 'package:ev_health/app/theme/app_theme.dart';
 import 'package:ev_health/application/adapter_discovery/adapter_discovery_controller.dart';
 import 'package:ev_health/application/home/home_controller.dart';
 import 'package:ev_health/application/onboarding/onboarding_flow_controller.dart';
+import 'package:ev_health/application/vehicle_confirmation/vehicle_confirmation_controller.dart';
 import 'package:ev_health/domain/onboarding/onboarding_repository.dart';
 import 'package:ev_health/domain/repositories/history_repository.dart';
 import 'package:ev_health/domain/repositories/settings_repository.dart';
@@ -30,6 +31,9 @@ class EvHealthApp extends StatefulWidget {
     this.adapterDiscoveryInitialState,
     this.adapterDiscoveryRetryAction,
     this.mockAdapterSelectionAction,
+    this.vehicleConfirmationRepository,
+    this.confirmVehicleAction,
+    this.exitUnsupportedVehicleAction,
     super.key,
   });
 
@@ -60,6 +64,15 @@ class EvHealthApp extends StatefulWidget {
   /// Overrides fictional adapter selection behaviour.
   final MockAdapterSelectionAction? mockAdapterSelectionAction;
 
+  /// Overrides the typed vehicle source for confirmation, primarily in tests.
+  final VehicleRepository? vehicleConfirmationRepository;
+
+  /// Overrides the application callback for supported confirmation.
+  final ConfirmVehicleAction? confirmVehicleAction;
+
+  /// Overrides the application callback for the unsupported safe exit.
+  final ExitUnsupportedVehicleAction? exitUnsupportedVehicleAction;
+
   @override
   State<EvHealthApp> createState() => _EvHealthAppState();
 }
@@ -69,6 +82,7 @@ class _EvHealthAppState extends State<EvHealthApp> {
   late final VehicleRepository _homeVehicleRepository;
   late final HistoryRepository _homeHistoryRepository;
   late final SettingsRepository _homeSettingsRepository;
+  late final VehicleRepository _vehicleConfirmationRepository;
 
   @override
   void initState() {
@@ -79,6 +93,8 @@ class _EvHealthAppState extends State<EvHealthApp> {
         widget.homeHistoryRepository ?? DemoHistoryRepository();
     _homeSettingsRepository =
         widget.homeSettingsRepository ?? const DemoSettingsRepository();
+    _vehicleConfirmationRepository =
+        widget.vehicleConfirmationRepository ?? _homeVehicleRepository;
     unawaited(_initializeRouter());
   }
 
@@ -133,6 +149,17 @@ class _EvHealthAppState extends State<EvHealthApp> {
             mockAdapterSelectionActionProvider.overrideWithValue(
               widget.mockAdapterSelectionAction!,
             ),
+          vehicleConfirmationRepositoryProvider.overrideWithValue(
+            _vehicleConfirmationRepository,
+          ),
+          if (widget.confirmVehicleAction != null)
+            confirmVehicleActionProvider.overrideWithValue(
+              widget.confirmVehicleAction!,
+            ),
+          if (widget.exitUnsupportedVehicleAction != null)
+            exitUnsupportedVehicleActionProvider.overrideWithValue(
+              widget.exitUnsupportedVehicleAction!,
+            ),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -162,6 +189,17 @@ class _EvHealthAppState extends State<EvHealthApp> {
         if (widget.mockAdapterSelectionAction != null)
           mockAdapterSelectionActionProvider.overrideWithValue(
             widget.mockAdapterSelectionAction!,
+          ),
+        vehicleConfirmationRepositoryProvider.overrideWithValue(
+          _vehicleConfirmationRepository,
+        ),
+        if (widget.confirmVehicleAction != null)
+          confirmVehicleActionProvider.overrideWithValue(
+            widget.confirmVehicleAction!,
+          ),
+        if (widget.exitUnsupportedVehicleAction != null)
+          exitUnsupportedVehicleActionProvider.overrideWithValue(
+            widget.exitUnsupportedVehicleAction!,
           ),
       ],
       child: MaterialApp.router(

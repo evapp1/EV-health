@@ -15,6 +15,9 @@ abstract final class AppRouteNames {
   /// Simulated adapter discovery setup screen.
   static const adapterDiscovery = 'adapter-discovery';
 
+  /// Demo vehicle confirmation setup screen.
+  static const vehicleConfirmation = 'vehicle-confirmation';
+
   /// Home root destination.
   static const home = 'home';
 
@@ -47,6 +50,9 @@ abstract final class AppRoutePaths {
 
   /// Simulated adapter discovery setup path.
   static const adapterDiscovery = '/setup/adapters';
+
+  /// Demo vehicle confirmation setup path.
+  static const vehicleConfirmation = '/setup/vehicle';
 
   /// Home root path.
   static const home = '/home';
