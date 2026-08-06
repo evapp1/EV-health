@@ -42,6 +42,27 @@ void main() {
     }
   });
 
+  test('Home presentation imports neither data nor infrastructure', () {
+    final homeFiles = Directory('lib/features/home')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.dart'));
+
+    for (final file in homeFiles) {
+      final source = file.readAsStringSync();
+      expect(
+        source,
+        isNot(contains('package:ev_health/data/')),
+        reason: '${file.path} imports a data implementation',
+      );
+      expect(
+        source,
+        isNot(contains('package:ev_health/infrastructure/')),
+        reason: '${file.path} imports an infrastructure implementation',
+      );
+    }
+  });
+
   test('application does not import presentation or infrastructure', () {
     const forbiddenImports = <String>['features/', 'infrastructure/'];
     final applicationFiles = Directory('lib/application')

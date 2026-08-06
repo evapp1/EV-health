@@ -12,7 +12,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('EV Health'), findsOneWidget);
-    expect(find.text('Battery health reports'), findsOneWidget);
+    expect(find.text('Latest demo battery report'), findsOneWidget);
     expect(_navigationBar(tester).selectedIndex, 0);
     expect(_router(tester).routeInformationProvider.value.uri.path, '/home');
   });
@@ -27,7 +27,7 @@ void main() {
       ('History', 'Scan history', 1),
       ('Reports', 'Saved reports', 2),
       ('Settings', 'App preferences will appear here.', 3),
-      ('Home', 'Battery health reports', 0),
+      ('Home', 'Latest demo battery report', 0),
     ];
 
     for (final destination in destinations) {
@@ -100,13 +100,13 @@ void main() {
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
 
-    expect(find.text('Battery health reports'), findsOneWidget);
+    expect(find.text('Latest demo battery report'), findsOneWidget);
     expect(_navigationBar(tester).selectedIndex, 0);
     expect(_router(tester).canPop(), isFalse);
 
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
-    expect(find.text('Battery health reports'), findsOneWidget);
+    expect(find.text('Latest demo battery report'), findsOneWidget);
     expect(_router(tester).canPop(), isFalse);
   });
 
@@ -178,11 +178,11 @@ GoRouter _router(WidgetTester tester) {
 }
 
 void _expectHomeTheme(WidgetTester tester, EvHealthColors colors) {
-  final homeContext = tester.element(find.text('Battery health reports'));
+  final homeContext = tester.element(find.text('Latest demo battery report'));
   final theme = Theme.of(homeContext);
-  final title = tester.widget<Text>(find.text('Battery health reports'));
+  final title = tester.widget<Text>(find.text('Latest demo battery report'));
   final body = tester.widget<Text>(
-    find.text('Clear battery insights, stored locally on your device.'),
+    find.textContaining('Fictional sample values. They were not measured'),
   );
 
   expect(theme.brightness, colors.brightness);

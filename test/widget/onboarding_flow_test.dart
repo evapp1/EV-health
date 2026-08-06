@@ -88,7 +88,7 @@ void main() {
 
     expect(bluetoothActionCount, 1);
     expect(await repository.isOnboardingComplete(), isTrue);
-    expect(find.text('Battery health reports'), findsOneWidget);
+    expect(find.text('Latest demo battery report'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(_router(tester).routeInformationProvider.value.uri.path, '/home');
   });
@@ -103,7 +103,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Battery health reports'), findsOneWidget);
+    expect(find.text('Latest demo battery report'), findsOneWidget);
     expect(find.text('Understand your EV battery'), findsNothing);
     expect(_router(tester).routeInformationProvider.value.uri.path, '/home');
   });
@@ -159,7 +159,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    expect(find.text('Battery health reports'), findsOneWidget);
+    expect(find.text('Latest demo battery report'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

@@ -2,10 +2,18 @@ import 'dart:async';
 
 import 'package:ev_health/app/navigation/app_router.dart';
 import 'package:ev_health/app/theme/app_theme.dart';
+import 'package:ev_health/application/home/home_controller.dart';
 import 'package:ev_health/application/onboarding/onboarding_flow_controller.dart';
 import 'package:ev_health/domain/onboarding/onboarding_repository.dart';
+import 'package:ev_health/domain/repositories/history_repository.dart';
+import 'package:ev_health/domain/repositories/settings_repository.dart';
+import 'package:ev_health/domain/repositories/vehicle_repository.dart';
+import 'package:ev_health/infrastructure/demo/demo_history_repository.dart';
+import 'package:ev_health/infrastructure/demo/demo_settings_repository.dart';
+import 'package:ev_health/infrastructure/demo/demo_vehicle_repository.dart';
 import 'package:ev_health/infrastructure/persistence/in_memory_onboarding_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// The root widget for EV Health.
@@ -14,6 +22,10 @@ class EvHealthApp extends StatefulWidget {
   const EvHealthApp({
     this.onboardingRepository,
     this.bluetoothOnboardingAction,
+    this.homeVehicleRepository,
+    this.homeHistoryRepository,
+    this.homeSettingsRepository,
+    this.demoScanAction,
     super.key,
   });
 
@@ -23,16 +35,39 @@ class EvHealthApp extends StatefulWidget {
   /// Overrides the no-op Bluetooth placeholder action.
   final BluetoothOnboardingAction? bluetoothOnboardingAction;
 
+  /// Overrides the Home vehicle port, primarily for tests.
+  final VehicleRepository? homeVehicleRepository;
+
+  /// Overrides the Home history port, primarily for tests.
+  final HistoryRepository? homeHistoryRepository;
+
+  /// Overrides the Home settings port, primarily for tests.
+  final SettingsRepository? homeSettingsRepository;
+
+  /// Injects the application-level placeholder that starts demo scanning.
+  final DemoScanAction? demoScanAction;
+
   @override
   State<EvHealthApp> createState() => _EvHealthAppState();
 }
 
 class _EvHealthAppState extends State<EvHealthApp> {
   GoRouter? _router;
+  late final VehicleRepository _homeVehicleRepository;
+  late final HistoryRepository _homeHistoryRepository;
+  late final SettingsRepository _homeSettingsRepository;
+  late final DemoScanAction _demoScanAction;
 
   @override
   void initState() {
     super.initState();
+    _homeVehicleRepository =
+        widget.homeVehicleRepository ?? DemoVehicleRepository();
+    _homeHistoryRepository =
+        widget.homeHistoryRepository ?? DemoHistoryRepository();
+    _homeSettingsRepository =
+        widget.homeSettingsRepository ?? const DemoSettingsRepository();
+    _demoScanAction = widget.demoScanAction ?? _defaultDemoScanAction;
     unawaited(_initializeRouter());
   }
 
@@ -61,26 +96,52 @@ class _EvHealthAppState extends State<EvHealthApp> {
   Widget build(BuildContext context) {
     final router = _router;
     if (router == null) {
-      return MaterialApp(
+      return ProviderScope(
+        overrides: [
+          homeVehicleRepositoryProvider.overrideWithValue(
+            _homeVehicleRepository,
+          ),
+          homeHistoryRepositoryProvider.overrideWithValue(
+            _homeHistoryRepository,
+          ),
+          homeSettingsRepositoryProvider.overrideWithValue(
+            _homeSettingsRepository,
+          ),
+          demoScanActionProvider.overrideWithValue(_demoScanAction),
+        ],
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'EV Health',
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          home: const Scaffold(body: SizedBox.shrink()),
+        ),
+      );
+    }
+
+    return ProviderScope(
+      overrides: [
+        homeVehicleRepositoryProvider.overrideWithValue(_homeVehicleRepository),
+        homeHistoryRepositoryProvider.overrideWithValue(_homeHistoryRepository),
+        homeSettingsRepositoryProvider.overrideWithValue(
+          _homeSettingsRepository,
+        ),
+        demoScanActionProvider.overrideWithValue(_demoScanAction),
+      ],
+      child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         title: 'EV Health',
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
-        home: const Scaffold(body: SizedBox.shrink()),
-      );
-    }
-
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'EV Health',
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      // Keep the approved follow-system policy explicit at the app root.
-      // ignore: avoid_redundant_argument_values
-      themeMode: ThemeMode.system,
-      routerConfig: router,
+        // Keep the approved follow-system policy explicit at the app root.
+        // ignore: avoid_redundant_argument_values
+        themeMode: ThemeMode.system,
+        routerConfig: router,
+      ),
     );
   }
 
   static Future<void> _defaultBluetoothAction() async {}
+
+  static Future<void> _defaultDemoScanAction() async {}
 }
