@@ -3,6 +3,8 @@ import 'package:ev_health/app/navigation/route_names.dart';
 import 'package:ev_health/application/home/home_controller.dart';
 import 'package:ev_health/application/onboarding/onboarding_flow_controller.dart';
 import 'package:ev_health/application/scan_preparation/scan_preparation_controller.dart';
+import 'package:ev_health/application/scan_progress/scan_progress_controller.dart';
+import 'package:ev_health/application/scan_progress/scan_progress_coordinator.dart';
 import 'package:ev_health/domain/models/vehicle.dart';
 import 'package:ev_health/features/adapter_discovery/presentation/screens/adapter_discovery_screen.dart';
 import 'package:ev_health/features/history/presentation/screens/history_screen.dart';
@@ -13,6 +15,7 @@ import 'package:ev_health/features/onboarding/presentation/screens/privacy_onboa
 import 'package:ev_health/features/onboarding/presentation/screens/welcome_onboarding_screen.dart';
 import 'package:ev_health/features/reports/presentation/screens/reports_screen.dart';
 import 'package:ev_health/features/scan_preparation/presentation/screens/scan_preparation_screen.dart';
+import 'package:ev_health/features/scan_progress/presentation/screens/scan_progress_screen.dart';
 import 'package:ev_health/features/settings/presentation/screens/settings_about_screen.dart';
 import 'package:ev_health/features/settings/presentation/screens/settings_screen.dart';
 import 'package:ev_health/features/vehicle_confirmation/presentation/screens/vehicle_confirmation_screen.dart';
@@ -23,12 +26,15 @@ import 'package:go_router/go_router.dart';
 /// Creates the application router and its state-preserving root branches.
 Future<GoRouter> createAppRouter(
   OnboardingFlowController onboarding, {
+  required ScanProgressCoordinator Function() scanProgressCoordinatorFactory,
   DemoScanAction? homeDemoScanAction,
+  StartScanAction? startScanAction,
+  String? initialLocationOverride,
 }) async {
   final startupDestination = await onboarding.resolveStartupDestination();
 
   return GoRouter(
-    initialLocation: _pathFor(startupDestination),
+    initialLocation: initialLocationOverride ?? _pathFor(startupDestination),
     routes: <RouteBase>[
       GoRoute(
         name: AppRouteNames.onboardingWelcome,
@@ -133,9 +139,43 @@ Future<GoRouter> createAppRouter(
           return ProviderScope(
             overrides: [
               scanPreparationVehicleProvider.overrideWithValue(vehicle),
+              startScanActionProvider.overrideWithValue((
+                confirmedVehicle,
+              ) async {
+                await startScanAction?.call(confirmedVehicle);
+                if (context.mounted) {
+                  context.go(
+                    AppRoutePaths.scanProgress,
+                    extra: confirmedVehicle,
+                  );
+                }
+              }),
             ],
             child: ScanPreparationScreen(
               onBack: () => context.go(AppRoutePaths.vehicleConfirmation),
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        name: AppRouteNames.scanProgress,
+        path: AppRoutePaths.scanProgress,
+        builder: (context, state) {
+          final vehicle = state.extra;
+          if (vehicle is! Vehicle) {
+            return const _MissingConfirmedVehicleScreen();
+          }
+          return ProviderScope(
+            overrides: [
+              scanProgressVehicleProvider.overrideWithValue(vehicle),
+              scanProgressCoordinatorProvider.overrideWithValue(
+                scanProgressCoordinatorFactory(),
+              ),
+            ],
+            child: ScanProgressScreen(
+              onPrepareAgain: () =>
+                  context.go(AppRoutePaths.scanPreparation, extra: vehicle),
+              onExit: () => context.go(AppRoutePaths.vehicleConfirmation),
             ),
           );
         },

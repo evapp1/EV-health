@@ -15,6 +15,7 @@ import 'package:ev_health/domain/repositories/settings_repository.dart';
 import 'package:ev_health/domain/repositories/vehicle_repository.dart';
 import 'package:ev_health/infrastructure/demo/demo_fixture.dart';
 import 'package:ev_health/infrastructure/demo/demo_history_repository.dart';
+import 'package:ev_health/infrastructure/demo/demo_scan_progress_coordinator.dart';
 import 'package:ev_health/infrastructure/demo/demo_settings_repository.dart';
 import 'package:ev_health/infrastructure/demo/demo_vehicle_repository.dart';
 import 'package:ev_health/infrastructure/persistence/in_memory_onboarding_repository.dart';
@@ -40,6 +41,8 @@ class EvHealthApp extends StatefulWidget {
     this.exitUnsupportedVehicleAction,
     this.scanPreparationConfiguration,
     this.startScanAction,
+    this.demoScanScenario = DemoScanScenario.complete,
+    this.initialLocation,
     super.key,
   });
 
@@ -85,6 +88,12 @@ class EvHealthApp extends StatefulWidget {
   /// Overrides the explicit Start Scan application hand-off.
   final StartScanAction? startScanAction;
 
+  /// Deterministic fictional outcome selected by development/QA or tests.
+  final DemoScanScenario demoScanScenario;
+
+  /// Optional development/QA initial route; production entry points omit it.
+  final String? initialLocation;
+
   @override
   State<EvHealthApp> createState() => _EvHealthAppState();
 }
@@ -118,6 +127,10 @@ class _EvHealthAppState extends State<EvHealthApp> {
     final router = await createAppRouter(
       onboarding,
       homeDemoScanAction: widget.demoScanAction,
+      scanProgressCoordinatorFactory: () =>
+          DemoScanProgressCoordinator(scenario: widget.demoScanScenario),
+      startScanAction: widget.startScanAction,
+      initialLocationOverride: widget.initialLocation,
     );
 
     if (!mounted) {
