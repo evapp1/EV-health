@@ -21,6 +21,9 @@ abstract final class AppRouteNames {
   /// Scan preparation shown after explicit vehicle confirmation.
   static const scanPreparation = 'scan-preparation';
 
+  /// Typed demo scan progress shown after explicit preparation hand-off.
+  static const scanProgress = 'scan-progress';
+
   /// Home root destination.
   static const home = 'home';
 
@@ -59,6 +62,9 @@ abstract final class AppRoutePaths {
 
   /// Scan preparation path.
   static const scanPreparation = '/scan/prepare';
+
+  /// Scan progress path.
+  static const scanProgress = '/scan/progress';
 
   /// Home root path.
   static const home = '/home';
