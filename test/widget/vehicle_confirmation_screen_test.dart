@@ -31,8 +31,12 @@ void main() {
     tester,
   ) async {
     Vehicle? confirmed;
+    Vehicle? routedVehicle;
     await tester.pumpWidget(
-      _screenApp(onConfirm: (vehicle) => confirmed = vehicle),
+      _screenApp(
+        onConfirm: (vehicle) => confirmed = vehicle,
+        onConfirmationComplete: (vehicle) async => routedVehicle = vehicle,
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -42,6 +46,7 @@ void main() {
     await tester.pump();
 
     expect(confirmed, same(DemoFixture.vehicle));
+    expect(routedVehicle, same(DemoFixture.vehicle));
     expect(find.text('Confirm the vehicle'), findsOneWidget);
     expect(find.text('Demo vehicle confirmed'), findsOneWidget);
     expect(find.textContaining('No scan has started'), findsOneWidget);
@@ -174,6 +179,7 @@ Widget _screenApp({
   ConfirmVehicleAction? onConfirm,
   ExitUnsupportedVehicleAction? onExit,
   VoidCallback? onSafeExitComplete,
+  Future<void> Function(Vehicle vehicle)? onConfirmationComplete,
   ThemeData? theme,
   TextScaler textScaler = TextScaler.noScaling,
 }) {
@@ -193,7 +199,10 @@ Widget _screenApp({
         data: MediaQuery.of(context).copyWith(textScaler: textScaler),
         child: child!,
       ),
-      home: VehicleConfirmationScreen(onSafeExitComplete: onSafeExitComplete),
+      home: VehicleConfirmationScreen(
+        onSafeExitComplete: onSafeExitComplete,
+        onConfirmationComplete: onConfirmationComplete,
+      ),
     ),
   );
 }

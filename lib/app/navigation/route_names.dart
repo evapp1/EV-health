@@ -18,6 +18,9 @@ abstract final class AppRouteNames {
   /// Demo vehicle confirmation setup screen.
   static const vehicleConfirmation = 'vehicle-confirmation';
 
+  /// Scan preparation shown after explicit vehicle confirmation.
+  static const scanPreparation = 'scan-preparation';
+
   /// Home root destination.
   static const home = 'home';
 
@@ -53,6 +56,9 @@ abstract final class AppRoutePaths {
 
   /// Demo vehicle confirmation setup path.
   static const vehicleConfirmation = '/setup/vehicle';
+
+  /// Scan preparation path.
+  static const scanPreparation = '/scan/prepare';
 
   /// Home root path.
   static const home = '/home';
