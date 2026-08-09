@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:ev_health/app/app.dart';
 import 'package:ev_health/app/theme/app_theme.dart';
 import 'package:ev_health/app/theme/color_tokens.dart';
 import 'package:ev_health/application/adapter_discovery/adapter_discovery_controller.dart';
+import 'package:ev_health/domain/models/vehicle.dart';
 import 'package:ev_health/infrastructure/persistence/in_memory_onboarding_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -113,6 +116,56 @@ void main() {
         '/setup/adapters',
       );
       expect(find.text('Representative mock devices'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'successful confirmation opens preparation and Android back returns confirmation',
+    (tester) async {
+      var startCalls = 0;
+      await tester.pumpWidget(
+        _returningUserApp(
+          discoveryState: AdapterDiscoveryDevicesFound(
+            AdapterDiscoveryMockFixtures.devices,
+          ),
+          onStartScan: (vehicle) => startCalls += 1,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('home-demo-scan-action')),
+        300,
+      );
+      await tester.tap(find.byKey(const Key('home-demo-scan-action')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('mock-adapter-MOCK-AURORA-01')));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('confirm-supported-vehicle')),
+        250,
+      );
+      await tester.tap(find.byKey(const Key('confirm-supported-vehicle')));
+      await tester.pumpAndSettle();
+
+      expect(
+        _router(tester).routeInformationProvider.value.uri.path,
+        '/scan/prepare',
+      );
+      expect(find.text('Prepare for battery scan'), findsOneWidget);
+      expect(find.text('Start Scan'), findsOneWidget);
+      expect(startCalls, 0);
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      expect(
+        _router(tester).routeInformationProvider.value.uri.path,
+        '/setup/vehicle',
+      );
+      expect(find.text('Demo vehicle confirmed'), findsOneWidget);
+      expect(find.text('Continue to scan preparation'), findsOneWidget);
+      expect(startCalls, 0);
     },
   );
 
@@ -242,11 +295,13 @@ void main() {
 EvHealthApp _returningUserApp({
   AdapterDiscoveryState? discoveryState,
   MockAdapterSelectionAction? onSelect,
+  FutureOr<void> Function(Vehicle vehicle)? onStartScan,
 }) {
   return EvHealthApp(
     onboardingRepository: InMemoryOnboardingRepository(initiallyComplete: true),
     adapterDiscoveryInitialState: discoveryState,
     mockAdapterSelectionAction: onSelect,
+    startScanAction: onStartScan,
   );
 }
 

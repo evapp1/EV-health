@@ -1,6 +1,7 @@
 import 'package:ev_health/app/theme/color_tokens.dart';
 import 'package:ev_health/app/theme/spacing_tokens.dart';
 import 'package:ev_health/application/vehicle_confirmation/vehicle_confirmation_controller.dart';
+import 'package:ev_health/domain/models/vehicle.dart';
 import 'package:ev_health/features/shared/presentation/widgets/error_panel.dart';
 import 'package:ev_health/features/vehicle_confirmation/presentation/models/vehicle_confirmation_view_data.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +12,16 @@ class VehicleConfirmationScreen extends ConsumerWidget {
   /// Creates the focused vehicle-confirmation route.
   const VehicleConfirmationScreen({
     this.onBack,
+    this.onConfirmationComplete,
     this.onSafeExitComplete,
     super.key,
   });
 
   /// Route-level Android and app-bar back action.
   final VoidCallback? onBack;
+
+  /// Route-level navigation after supported confirmation succeeds.
+  final Future<void> Function(Vehicle vehicle)? onConfirmationComplete;
 
   /// Route-level navigation after the application safe-exit callback succeeds.
   final VoidCallback? onSafeExitComplete;
@@ -66,12 +71,22 @@ class VehicleConfirmationScreen extends ConsumerWidget {
                       SupportedVehicleConfirmation(:final vehicle) =>
                         _SupportedState(
                           viewData: VehicleConfirmationViewData.from(vehicle),
-                          onConfirm: controller.confirm,
+                          onConfirm: () async {
+                            final confirmed = await controller.confirm();
+                            if (context.mounted && confirmed != null) {
+                              await onConfirmationComplete?.call(confirmed);
+                            }
+                          },
                           onReject: controller.reject,
                         ),
                       ConfirmedVehicleConfirmation(:final vehicle) =>
                         _ConfirmedState(
                           viewData: VehicleConfirmationViewData.from(vehicle),
+                          onContinue: onConfirmationComplete == null
+                              ? null
+                              : () async {
+                                  await onConfirmationComplete!(vehicle);
+                                },
                         ),
                       UnsupportedVehicleConfirmation() => _UnsupportedState(
                         onSafeExit: () async {
@@ -367,9 +382,10 @@ class _UnsupportedState extends StatelessWidget {
 }
 
 class _ConfirmedState extends StatelessWidget {
-  const _ConfirmedState({required this.viewData});
+  const _ConfirmedState({required this.viewData, required this.onContinue});
 
   final VehicleConfirmationViewData viewData;
+  final VoidCallback? onContinue;
 
   @override
   Widget build(BuildContext context) {
@@ -379,7 +395,7 @@ class _ConfirmedState extends StatelessWidget {
       liveRegion: true,
       label:
           '${viewData.displayName} demo profile confirmed. No scan has '
-          'started. Scan preparation is not available yet.',
+          'started.',
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: colors.positive.withValues(alpha: 0.10),
@@ -412,12 +428,20 @@ class _ConfirmedState extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.medium),
               Text(
-                'Scan preparation is not part of this screen. Use Back to '
-                'return to adapter discovery.',
+                'Continue to review the safety and power-state preparation '
+                'instructions. Opening preparation does not start a scan.',
                 style: Theme.of(
                   context,
                 ).textTheme.bodyMedium?.copyWith(color: colors.textSecondary),
               ),
+              if (onContinue != null) ...[
+                const SizedBox(height: AppSpacing.large),
+                FilledButton(
+                  key: const Key('continue-to-scan-preparation'),
+                  onPressed: onContinue,
+                  child: const Text('Continue to scan preparation'),
+                ),
+              ],
             ],
           ),
         ),

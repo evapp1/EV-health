@@ -5,11 +5,15 @@ import 'package:ev_health/app/theme/app_theme.dart';
 import 'package:ev_health/application/adapter_discovery/adapter_discovery_controller.dart';
 import 'package:ev_health/application/home/home_controller.dart';
 import 'package:ev_health/application/onboarding/onboarding_flow_controller.dart';
+import 'package:ev_health/application/scan_preparation/scan_preparation_configuration.dart';
+import 'package:ev_health/application/scan_preparation/scan_preparation_controller.dart';
 import 'package:ev_health/application/vehicle_confirmation/vehicle_confirmation_controller.dart';
+import 'package:ev_health/domain/models/domain_enums.dart';
 import 'package:ev_health/domain/onboarding/onboarding_repository.dart';
 import 'package:ev_health/domain/repositories/history_repository.dart';
 import 'package:ev_health/domain/repositories/settings_repository.dart';
 import 'package:ev_health/domain/repositories/vehicle_repository.dart';
+import 'package:ev_health/infrastructure/demo/demo_fixture.dart';
 import 'package:ev_health/infrastructure/demo/demo_history_repository.dart';
 import 'package:ev_health/infrastructure/demo/demo_settings_repository.dart';
 import 'package:ev_health/infrastructure/demo/demo_vehicle_repository.dart';
@@ -34,6 +38,8 @@ class EvHealthApp extends StatefulWidget {
     this.vehicleConfirmationRepository,
     this.confirmVehicleAction,
     this.exitUnsupportedVehicleAction,
+    this.scanPreparationConfiguration,
+    this.startScanAction,
     super.key,
   });
 
@@ -72,6 +78,12 @@ class EvHealthApp extends StatefulWidget {
 
   /// Overrides the application callback for the unsupported safe exit.
   final ExitUnsupportedVehicleAction? exitUnsupportedVehicleAction;
+
+  /// Overrides profile preparation configuration, primarily for tests.
+  final ScanPreparationConfiguration? scanPreparationConfiguration;
+
+  /// Overrides the explicit Start Scan application hand-off.
+  final StartScanAction? startScanAction;
 
   @override
   State<EvHealthApp> createState() => _EvHealthAppState();
@@ -160,6 +172,12 @@ class _EvHealthAppState extends State<EvHealthApp> {
             exitUnsupportedVehicleActionProvider.overrideWithValue(
               widget.exitUnsupportedVehicleAction!,
             ),
+          scanPreparationConfigurationProvider.overrideWithValue(
+            widget.scanPreparationConfiguration ??
+                _defaultScanPreparationConfiguration,
+          ),
+          if (widget.startScanAction != null)
+            startScanActionProvider.overrideWithValue(widget.startScanAction!),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -201,6 +219,12 @@ class _EvHealthAppState extends State<EvHealthApp> {
           exitUnsupportedVehicleActionProvider.overrideWithValue(
             widget.exitUnsupportedVehicleAction!,
           ),
+        scanPreparationConfigurationProvider.overrideWithValue(
+          widget.scanPreparationConfiguration ??
+              _defaultScanPreparationConfiguration,
+        ),
+        if (widget.startScanAction != null)
+          startScanActionProvider.overrideWithValue(widget.startScanAction!),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
@@ -216,4 +240,14 @@ class _EvHealthAppState extends State<EvHealthApp> {
   }
 
   static Future<void> _defaultBluetoothAction() async {}
+
+  static final _defaultScanPreparationConfiguration =
+      ScanPreparationConfiguration([
+        VehiclePreparationInstructions(
+          profile: DemoFixture.profile,
+          source: DataSource.demo,
+          powerStateInstruction: 'Keep the vehicle switched on and ready.',
+          basis: PreparationInstructionBasis.demoAssumption,
+        ),
+      ]);
 }

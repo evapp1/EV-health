@@ -46,13 +46,13 @@ final class VehicleConfirmationController
   Future<VehicleConfirmationState> build() => _loadSupportedVehicle();
 
   /// Confirms the currently displayed supported demo profile.
-  Future<void> confirm() async {
+  Future<Vehicle?> confirm() async {
     final current = state.value;
     if (current is! SupportedVehicleConfirmation) {
       throw StateError('Only a supported vehicle can be confirmed.');
     }
     if (_isConfirming) {
-      return;
+      return null;
     }
 
     _isConfirming = true;
@@ -61,6 +61,7 @@ final class VehicleConfirmationController
       state = AsyncData<VehicleConfirmationState>(
         ConfirmedVehicleConfirmation(current.vehicle),
       );
+      return current.vehicle;
     } finally {
       _isConfirming = false;
     }
